@@ -76,6 +76,13 @@ function endpoint(provider: LlmProvider, baseUrl: string, model: string): { base
 
 /** Sends one prompt to the provider configured in Settings. An image is attached when the caller has one. */
 export async function complete(prompt: string, imageDataUrl?: string): Promise<string> {
+  // The dashboard is a browser page, so Anthropic treats its request as a cross-origin call and rejects it.
+  // The service worker has no page origin, so the same request is accepted.
+  if (typeof window !== 'undefined') {
+    const response = await chrome.runtime.sendMessage({ type: 'llm-complete', prompt, imageDataUrl }) as { ok?: boolean; text?: string; error?: string } | undefined;
+    if (!response?.ok || !response.text) throw new Error(response?.error ?? 'The AI request did not finish.');
+    return response.text;
+  }
   const settings = await getSettings();
   if (!settings.llmApiKey.trim()) throw new Error('Add an API key under Settings, in the AI section.');
   const target = endpoint(settings.llmProvider, settings.llmBaseUrl, settings.llmModel);

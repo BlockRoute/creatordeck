@@ -35,7 +35,7 @@ export function SettingsPage() {
 
   const preset = LLM_PRESETS[settings.llmProvider];
   return (
-    <Page title="Settings" subtitle="Connect your channel, choose your region, and add an AI key if you want the AI tools.">
+    <Page title="Settings" subtitle={`Connect your channel, choose your region, and add an AI key if you want the AI tools. Version ${chrome.runtime.getManifest().version}.`}>
       <Card
         title="YouTube channel"
         hint="Needed for the tools that read or change your own videos. Research and insight tools work without it."

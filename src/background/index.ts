@@ -1,3 +1,4 @@
+import { complete } from '../services/ai';
 import { tick } from '../services/jobs';
 import { carrierFetch } from '../yt/carrier';
 
@@ -43,6 +44,13 @@ chrome.runtime.onMessage.addListener((message: unknown, sender, sendResponse) =>
     openPanel(sender.tab?.id, message.path);
     sendResponse({ ok: true });
     return;
+  }
+  if (message.type === 'llm-complete' && 'prompt' in message && typeof message.prompt === 'string') {
+    const image = 'imageDataUrl' in message && typeof message.imageDataUrl === 'string' ? message.imageDataUrl : undefined;
+    void complete(message.prompt, image)
+      .then((text) => sendResponse({ ok: true, text }))
+      .catch((error: unknown) => sendResponse({ ok: false, error: error instanceof Error ? error.message : String(error) }));
+    return true;
   }
   if (message.type === 'yt-fetch' && 'url' in message && typeof message.url === 'string') {
     const method = 'method' in message && typeof message.method === 'string' ? message.method : 'GET';
