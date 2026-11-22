@@ -54,7 +54,12 @@ async function anthropic(baseUrl: string, apiKey: string, model: string, prompt:
   }
   const response = await fetch(`${baseUrl.replace(/\/$/, '')}/messages`, {
     method: 'POST',
-    headers: { 'x-api-key': apiKey, 'anthropic-version': '2023-06-01', 'content-type': 'application/json' },
+    headers: {
+      'x-api-key': apiKey,
+      'anthropic-version': '2023-06-01',
+      'anthropic-dangerous-direct-browser-access': 'true',
+      'content-type': 'application/json',
+    },
     body: JSON.stringify({ model, max_tokens: 1500, messages: [{ role: 'user', content }] }),
   });
   if (!response.ok) throw new Error(await readError(response));
